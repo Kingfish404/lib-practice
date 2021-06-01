@@ -8,7 +8,6 @@
     <title>vue-like</title>
     <style>
         * {
-            width: 100%;
             text-align: center;
         }
 
@@ -16,6 +15,12 @@
             width: initial;
             min-height: 2rem;
             margin: 1rem;
+        }
+
+        .app {
+            border: 1px solid gray;
+            margin: 1rem;
+            padding: 1rem;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -28,8 +33,8 @@
 </head>
 
 <body>
-    <div class="app1"></div>
-    <div class="app2"></div>
+    <div class="app1 app"></div>
+    <div class="app2 app"></div>
     <script type="module" src="./vue-like.js"></script>
     <script type="module">
         import Vue from './vue-like.js';
