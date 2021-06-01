@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue-like</title>
+</head>
+
+<body>
+    <div class="app1"></div>
+    <div class="app2"></div>
+    <script type="module" src="./vue-like.js"></script>
+    <script type="module">
+        import Vue from './vue-like.js';
+        const appData1 = {
+            data: {
+                counter: 0
+            },
+            methods: {
+                increase() {
+                    this.counter++;
+                },
+                decrease() {
+                    this.counter--;
+                },
+            },
+            render: Vue.h('h1', {
+                onclick: 'decrease'
+            }, "App1: {{ counter }} click to increase")
+        }
+
+        const appData2 = {
+            data: {
+                counter: 1
+            },
+            methods: {
+                increase() {
+                    this.counter++;
+                },
+                decrease() {
+                    this.counter--;
+                },
+            },
+            render: Vue.h('div', {
+            }, [Vue.h('h2', {}, "App2:watch {{ counter }}"),
+            Vue.h('button', {
+                onclick: 'increase'
+            }, "increase"),
+            Vue.h('button', {
+                onclick: 'decrease'
+            }, "decrease")])
+        }
+
+        Vue.createApp(appData1).mount('.app1');
+        Vue.createApp(appData2).mount('.app2');
+
+        var js_url = './vue-like.js';
+        var xhr = new XMLHttpRequest()
+        xhr.open('get', js_url, true)
+        xhr.onreadystatechange = function (res) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                // console.log(xhr.response)
+            }
+        };
+        xhr.send();
+    </script>
+</body>
+
+</html>
