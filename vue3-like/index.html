@@ -6,6 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>vue-like</title>
+    <style>
+        * {
+            width: 100%;
+            text-align: center;
+        }
+
+        button {
+            width: initial;
+            min-height: 2rem;
+            margin: 1rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            * {
+                background-color: black;
+                color: white;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -47,10 +66,10 @@
             }, [Vue.h('h2', {}, "App2:watch {{ counter }}"),
             Vue.h('button', {
                 onclick: 'increase'
-            }, "increase"),
+            }, "increase {{ counter }}"),
             Vue.h('button', {
                 onclick: 'decrease'
-            }, "decrease")])
+            }, "decrease {{ counter }}")])
         }
 
         Vue.createApp(appData1).mount('.app1');
