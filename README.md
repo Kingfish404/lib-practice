@@ -10,6 +10,8 @@
     自己实现一些小游戏
     * [pong](/lib-practice/game-like/pong/): 经典pong game，实现了个简单的物理运动和碰撞系统
 
+访问预览需要基于git page: [https://blog.achacker.com/lib-practice/](https://blog.achacker.com/lib-practice/)
+
 ## LICENCE
 
 MIT
