@@ -51,7 +51,7 @@
             width: 10px;
             position: relative;
             background-color: white;
-            transition: 0.01s linear;
+            transition: 0.1s linear;
             transition-property: top;
             will-change: top;
         }
@@ -95,41 +95,95 @@
             half_height: document.getElementById('play_ground').clientHeight / 2,
             game: {
                 main: null,
-                is_start: false
-            },
-            player_a: {
-                node: document.getElementById('player_a'),
-                height: document.getElementById('player_a').clientHeight,
-                data: {
-                    y: 0,
-                    speed: 5,
+                is_start: false,
+                update: function () {
+                    // ball chack
+                    if (this.ball.data.y < 0 || this.ball.data.y > global.height) {
+                        // hit up or down
+                        this.ball.data.angle = 180 - this.ball.data.angle;
+                    } else if (this.ball.data.x < 0) {
+                        // console.log(this.ball.data.y, this.player_a.data.y, this.player_a.height / 2, this.ball.height)
+                        setTimeout(() => {
+                            if (this.ball.data.y > (this.player_a.data.y + this.player_a.height / 2 + this.ball.height) ||
+                                this.ball.data.y < (this.player_a.data.y - this.player_a.height / 2 - this.ball.height)) {
+                                gameOver();
+                            }
+                        }, 25);
+                        var between = this.ball.data.y - this.player_a.data.y;
+                        between = Math.min(between, 20);
+                        between = Math.max(between, -20);
+                        this.ball.data.angle = 360 - this.ball.data.angle - between + Math.random() * 10 - 5;
+                        this.ball.data._speed *= 1.1;
+                    } else if (this.ball.data.x > global.width) {
+                        if (this.ball.data.y > (this.player_b.data.y + this.player_b.height / 2 + this.ball.height) ||
+                            this.ball.data.y < (this.player_b.data.y - this.player_b.height / 2 - this.ball.height)) {
+                            gameWin();
+                            return;
+                        }
+                        this.ball.data.angle = 360 - this.ball.data.angle;
+                    }
                 }
             },
-            player_b: {
-                node: document.getElementById('player_b'),
-                height: document.getElementById('player_b').clientHeight,
-                data: {
-                    y: 0,
-                    speed: 20,
-                }
-            },
-            ball: {
-                node: document.getElementById('ball'),
-                height: document.getElementById('ball').clientHeight,
-                data: {
-                    x: 0,
-                    y: 0,
-                    speed: 10,
-                    angle: 60,
-                }
-            },
+            object: {
+                player_a: {
+                    node: document.getElementById('player_a'),
+                    height: document.getElementById('player_a').clientHeight,
+                    data: {
+                        y: 0,
+                        speed: 10,
+                        angle: 0,
+                    },
+                    update: function () {
+
+                    }
+                },
+                player_b: {
+                    node: document.getElementById('player_b'),
+                    height: document.getElementById('player_b').clientHeight,
+                    data: {
+                        y: 0,
+                        speed: 10,
+                        angle: 0,
+                    },
+                    update: function () {
+                        // player b move
+                        if (global.object.ball.data.y - this.data.y > this.height / 3) {
+                            this.data.angle = 0;
+                        } else if (global.object.ball.data.y - this.data.y < -this.height / 3) {
+                            this.data.angle = 180;
+                        } else {
+                            return;
+                        }
+                        var radian = this.data.angle * Math.PI / 180;
+                        this.data.y += Math.cos(radian) * this.data.speed;
+                    }
+                },
+                ball: {
+                    node: document.getElementById('ball'),
+                    height: document.getElementById('ball').clientHeight,
+                    data: {
+                        x: 100,
+                        y: 0,
+                        speed: 10,
+                        angle: 60,
+                        _speed: 0,
+                    },
+                    update: function () {
+                        var radian = this.data.angle * Math.PI / 180;
+
+                        // ball move
+                        this.data.x += Math.sin(radian) * this.data._speed;
+                        this.data.y += Math.cos(radian) * this.data._speed;
+                    }
+                },
+            }
         }
 
         function handleMove(clientX, clientY) {
             if (clientX < global.half_width) {
-                global.player_a.data.y = clientY;
-                var transform_str = "translateY(" + String(global.player_a.data.y - global.player_a.height / 2) + "px)";
-                global.player_a.node.style.transform = transform_str;
+                global.object.player_a.data.y = clientY;
+                var transform_str = "translateY(" + String(global.object.player_a.data.y - global.object.player_a.height / 2) + "px)";
+                global.object.player_a.node.style.transform = transform_str;
             }
         }
 
@@ -145,59 +199,21 @@
         }
 
         function gameMain() {
-            var radian = global.ball.data.angle * Math.PI / 180;
-            var isHit = false;
-
-            // ball move
-            global.ball.data.x += Math.sin(radian) * global.ball.data.speed;
-            global.ball.data.y += Math.cos(radian) * global.ball.data.speed;
-
-            // ball chack
-            if (global.ball.data.y < 0 || global.ball.data.y > global.height) {
-                // hit up or down
-                global.ball.data.angle = 180 - global.ball.data.angle;
-                isHit = true;
-            } else if (global.ball.data.x < 0) {
-                // console.log(global.ball.data.y, global.player_a.data.y, global.player_a.height / 2, global.ball.height)
-                setTimeout(() => {
-                    if (global.ball.data.y > (global.player_a.data.y + global.player_a.height / 2 + global.ball.height) ||
-                        global.ball.data.y < (global.player_a.data.y - global.player_a.height / 2 - global.ball.height)) {
-                        gameOver();
-                    }
-                }, 25);
-                var between = global.ball.data.y - global.player_a.data.y;
-                between = Math.min(between, 20);
-                between = Math.max(between, -20);
-                global.ball.data.angle = 360 - global.ball.data.angle - between + Math.random() * 10 - 5;
-                global.ball.data.speed *= 1.1;
-                isHit = true;
-            } else if (global.ball.data.x > global.width) {
-                if (global.ball.data.y > (global.player_b.data.y + global.player_b.height / 2 + global.ball.height) ||
-                    global.ball.data.y < (global.player_b.data.y - global.player_b.height / 2 - global.ball.height)) {
-                    gameWin();
-                    return;
+            for (var i in global.object) {
+                if (global.object[i].update) {
+                    global.object[i].update();
                 }
-                global.ball.data.angle = 360 - global.ball.data.angle;
-                isHit = true;
-            }
-            if (isHit) {
-                return;
             }
 
-            // player b move
-            if (Math.abs(global.ball.data.y - global.player_b.data.y) > global.player_b.height / 3) {
-                global.player_b.data.y += Math.min(global.player_b.data.speed * (global.ball.data.y - global.player_b.data.y > 0 ? 1 : -1));
-            } else if (global.ball.data.y > global.half_width && (global.ball.data.angle > 60 || global.ball.data.angle < 120)) {
-                global.player_b.data.y += Math.min(global.player_b.data.speed * (global.ball.data.y - global.player_b.data.y > 0 ? 1 : -1), 5) * Math.cos(radian);
-            }
+            global.game.update.call(global.object);
 
             // ball show generate
-            global.ball.node.style.top = global.ball.data.y + 'px';
-            global.ball.node.style.left = global.ball.data.x + 'px';
+            global.object.ball.node.style.top = global.object.ball.data.y + 'px';
+            global.object.ball.node.style.left = global.object.ball.data.x + 'px';
 
             // player b genreate
-            var transform_str = "translateY(" + String(global.player_b.data.y - global.player_b.height / 2) + "px)";
-            global.player_b.node.style.transform = transform_str;
+            var transform_str = "translateY(" + String(global.object.player_b.data.y - global.object.player_b.height / 2) + "px)";
+            global.object.player_b.node.style.transform = transform_str;
         }
 
         function addLisitener() {
@@ -229,6 +245,13 @@
             removeLisitener();
             clearInterval(global.game.main);
             global.game.main = setInterval(gameMain, 20);
+            for (var i in global.object) {
+                for (var j in global.object[i].data) {
+                    if (j.startsWith('_')) {
+                        global.object[i].data[j] = global.object[i].data[j.substring(1)];
+                    }
+                }
+            }
             document.getElementById('menu_btn_stop').innerText = "STOP";
             document.getElementById('menu_title').innerText = '';
             document.getElementById('menu_btn_stop').onclick = gameStop;
@@ -247,10 +270,9 @@
                 if (global.game.main != null) {
                     return;
                 };
-                global.ball.data.speed = 10;
-                global.ball.data.angle = Math.random() * 90 + 30;
-                global.ball.data.x = 0;
-                global.ball.data.y = global.player_a.data.y;
+                global.object.ball.data.angle = Math.random() * 90 + 30;
+                global.object.ball.data.x = 0;
+                global.object.ball.data.y = global.object.player_a.data.y;
                 gameStart();
             });
             document.getElementById('menu_title').innerText = "GAME OVER";
@@ -261,21 +283,18 @@
                 if (global.game.main != null) {
                     return;
                 }
-                global.ball.data.speed = 10;
-                global.ball.data.angle = Math.random() * 90 + 30;
-                global.ball.data.x = 0;
-                global.ball.data.y = global.player_a.data.y;
+                global.object.ball.data.angle = Math.random() * 90 + 30;
+                global.object.ball.data.x = 0;
+                global.object.ball.data.y = global.object.player_a.data.y;
                 gameStart();
             });
             document.getElementById('menu_title').innerText = "YOU WIN";
         }
-
         function initGame() {
             document.getElementById('menu_btn_stop').onclick = gameStart;
             document.getElementById('menu_btn_stop').innerText = "START";
-            global.ball.data.speed = 10;
-            global.ball.data.angle = Math.random() * 90 + 30;
-            global.ball.data.y = global.player_a.data.y;
+            global.object.ball.data.angle = Math.random() * 90 + 30;
+            global.object.ball.data.y = global.object.player_a.data.y;
         }
         initGame();
     </script>
